@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Instant Chat</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">#</div>
+        <div>
+          <strong>Instant Chat</strong>
+          <small>IRC // realtime</small>
+        </div>
+      </div>
+
+      <button id="newRoom" class="new-room">＋ New room</button>
+
+      <div class="section-title">CHANNELS</div>
+      <div id="rooms" class="rooms"></div>
+
+      <div class="profile">
+        <div id="avatar" class="avatar">?</div>
+        <div class="profile-name">
+          <strong id="myName">Connecting…</strong>
+          <small><span class="status-dot"></span> online</small>
+        </div>
+        <button id="changeNick" title="Change nickname">⚙</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="chat-header">
+        <div>
+          <h1 id="roomName">#general</h1>
+          <span id="roomTopic">Realtime chat</span>
+        </div>
+        <div class="header-right">
+          <span id="connection" class="connection offline">Connecting…</span>
+          <button id="usersToggle">☷ <span id="userCount">0</span></button>
+        </div>
+      </header>
+
+      <section id="messages" class="messages" aria-live="polite"></section>
+
+      <div id="typing" class="typing"></div>
+
+      <form id="composer" class="composer">
+        <textarea id="input" rows="1" maxlength="2000"
+          placeholder="Message #general — Enter to send, Shift+Enter for a new line"></textarea>
+        <button type="submit" aria-label="Send">➤</button>
+      </form>
+    </main>
+
+    <aside id="userPanel" class="user-panel">
+      <div class="panel-title">ONLINE — <span id="panelCount">0</span></div>
+      <div id="users"></div>
+    </aside>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 id="modalTitle">Change nickname</h2>
+      <input id="modalInput" maxlength="24" autocomplete="off">
+      <div class="modal-actions">
+        <button id="modalCancel">Cancel</button>
+        <button id="modalOK" class="primary">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/config.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
