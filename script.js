@@ -1,11 +1,11 @@
-```javascript
+
 // ==========================================
 // CHATTY - FRONTEND CLIENT
 // GitHub Pages -> Cloudflare Tunnel -> FastAPI -> chat.db
 // ==========================================
 
 // CHANGE THIS to your Cloudflare Tunnel URL.
-const API = "https://YOUR-TUNNEL.trycloudflare.com";
+const API = "https://len-superintendent-spec-segment.trycloudflare.com";
 
 // ==========================================
 // ELEMENTS
@@ -454,4 +454,4 @@ inputEl.addEventListener("input", () => {
 function scrollToBottom() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
 }
-```
+
