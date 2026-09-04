@@ -1,4 +1,4 @@
-const API = "https://does-twelve-programmer-employer.trycloudflare.com";
+const API = "https://compact-legend-northeast-context.trycloudflare.com";
 
 // Get elements
 const messagesEl = document.getElementById("messages");
