@@ -1,5 +1,4 @@
-```javascript
-const API = "https://YOUR-TUNNEL.trycloudflare.com";
+const API = "https://len-superintendent-spec-segment.trycloudflare.com";
 
 const usernameInput = document.getElementById("username");
 const messageInput = document.getElementById("message");
@@ -99,4 +98,3 @@ messageInput.addEventListener("keydown", (event) => {
 loadMessages();
 
 setInterval(loadMessages, 3000);
-```
