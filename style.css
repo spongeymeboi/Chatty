@@ -369,3 +369,14 @@ button { cursor: pointer; }
   .composer { margin: 6px 10px 10px; }
   .chat-header { padding: 10px 12px; }
 }
+
+.beta-notice {
+  position: fixed;
+  bottom: 10px;
+  right: 15px;
+  color: red;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 9999;
+  pointer-events: none;
+}
