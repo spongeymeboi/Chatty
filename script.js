@@ -1,23 +1,12 @@
-
-// ==========================================
-// CHATTY - FRONTEND CLIENT
-// GitHub Pages -> Cloudflare Tunnel -> FastAPI -> chat.db
-// ==========================================
-
-// CHANGE THIS to your Cloudflare Tunnel URL.
 const API = "https://does-twelve-programmer-employer.trycloudflare.com";
 
-// ==========================================
-// ELEMENTS
-// ==========================================
-
+// Get elements
 const messagesEl = document.getElementById("messages");
 const inputEl = document.getElementById("input");
 const composer = document.getElementById("composer");
 
 const myNameEl = document.getElementById("myName");
 const avatarEl = document.getElementById("avatar");
-
 const connectionEl = document.getElementById("connection");
 
 const roomsEl = document.getElementById("rooms");
@@ -38,10 +27,7 @@ const userPanel = document.getElementById("userPanel");
 const typingEl = document.getElementById("typing");
 
 
-// ==========================================
-// STATE
-// ==========================================
-
+// Username
 let username = localStorage.getItem("chatty_username");
 
 if (!username) {
@@ -49,28 +35,35 @@ if (!username) {
     localStorage.setItem("chatty_username", username);
 }
 
+let messages = [];
 let currentRoom = "general";
 
-let messages = [];
 
-
-// ==========================================
-// INITIALIZATION
-// ==========================================
+// ==========================
+// INITIALIZE
+// ==========================
 
 function initialize() {
-    myNameEl.textContent = username;
 
-    avatarEl.textContent = username.charAt(0).toUpperCase();
+    if (myNameEl) {
+        myNameEl.textContent = username;
+    }
 
-    roomNameEl.textContent = "#general";
-    roomTopicEl.textContent = "Realtime chat";
+    if (avatarEl) {
+        avatarEl.textContent = username.charAt(0).toUpperCase();
+    }
+
+    if (roomNameEl) {
+        roomNameEl.textContent = "#general";
+    }
+
+    if (roomTopicEl) {
+        roomTopicEl.textContent = "Realtime chat";
+    }
 
     createDefaultRoom();
-
     loadMessages();
 
-    // Refresh messages every 3 seconds.
     setInterval(loadMessages, 3000);
 
     setConnection("Connecting…", false);
@@ -79,35 +72,40 @@ function initialize() {
 initialize();
 
 
-// ==========================================
-// CONNECTION STATUS
-// ==========================================
+// ==========================
+// CONNECTION
+// ==========================
 
 function setConnection(text, online) {
+
+    if (!connectionEl) return;
+
     connectionEl.textContent = text;
 
     connectionEl.classList.remove("online");
     connectionEl.classList.remove("offline");
 
-    if (online) {
-        connectionEl.classList.add("online");
-    } else {
-        connectionEl.classList.add("offline");
-    }
+    connectionEl.classList.add(
+        online ? "online" : "offline"
+    );
 }
 
 
-// ==========================================
+// ==========================
 // ROOMS
-// ==========================================
+// ==========================
 
 function createDefaultRoom() {
+
+    if (!roomsEl) return;
+
     roomsEl.innerHTML = "";
 
     const room = document.createElement("button");
 
     room.className = "room active";
     room.textContent = "# general";
+    room.type = "button";
 
     room.addEventListener("click", () => {
         switchRoom("general");
@@ -118,54 +116,63 @@ function createDefaultRoom() {
 
 
 function switchRoom(room) {
+
     currentRoom = room;
 
-    roomNameEl.textContent = "#" + room;
+    if (roomNameEl) {
+        roomNameEl.textContent = "#" + room;
+    }
 
-    inputEl.placeholder =
-        `Message #${room} — Enter to send, Shift+Enter for a new line`;
+    if (inputEl) {
+        inputEl.placeholder =
+            `Message #${room} — Enter to send, Shift+Enter for a new line`;
+    }
 
     loadMessages();
 }
 
 
-newRoomButton.addEventListener("click", () => {
-    const name = prompt("Enter a room name:");
+if (newRoomButton) {
 
-    if (!name) {
-        return;
-    }
+    newRoomButton.addEventListener("click", () => {
 
-    const cleanName = name
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9-_]/g, "-");
+        const name = prompt("Enter a room name:");
 
-    if (!cleanName) {
-        return;
-    }
+        if (!name) return;
 
-    const room = document.createElement("button");
+        const cleanName = name
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9-_]/g, "-");
 
-    room.className = "room";
-    room.textContent = "# " + cleanName;
+        if (!cleanName) return;
 
-    room.addEventListener("click", () => {
+        const room = document.createElement("button");
+
+        room.className = "room";
+        room.type = "button";
+        room.textContent = "# " + cleanName;
+
+        room.addEventListener("click", () => {
+            switchRoom(cleanName);
+        });
+
+        roomsEl.appendChild(room);
+
         switchRoom(cleanName);
     });
 
-    roomsEl.appendChild(room);
-
-    switchRoom(cleanName);
-});
+}
 
 
-// ==========================================
+// ==========================
 // LOAD MESSAGES
-// ==========================================
+// ==========================
 
 async function loadMessages() {
+
     try {
+
         const response = await fetch(
             `${API}/api/messages`,
             {
@@ -176,14 +183,14 @@ async function loadMessages() {
 
         if (!response.ok) {
             throw new Error(
-                `Server returned HTTP ${response.status}`
+                `HTTP ${response.status}`
             );
         }
 
         const data = await response.json();
 
         if (!Array.isArray(data)) {
-            throw new Error("Invalid message data received.");
+            throw new Error("Invalid message data.");
         }
 
         messages = data;
@@ -193,6 +200,7 @@ async function loadMessages() {
         setConnection("Connected", true);
 
     } catch (error) {
+
         console.error("Chatty API error:", error);
 
         setConnection("Offline", false);
@@ -200,11 +208,14 @@ async function loadMessages() {
 }
 
 
-// ==========================================
-// RENDER MESSAGES
-// ==========================================
+// ==========================
+// RENDER
+// ==========================
 
 function renderMessages() {
+
+    if (!messagesEl) return;
+
     messagesEl.innerHTML = "";
 
     for (const message of messages) {
@@ -216,35 +227,52 @@ function renderMessages() {
 
 
 function addMessageToScreen(message) {
+
+    if (!messagesEl) return;
+
     const wrapper = document.createElement("div");
 
     wrapper.className = "message";
 
-    const usernameElement = document.createElement("strong");
 
-    usernameElement.className = "message-user";
+    const usernameElement =
+        document.createElement("strong");
 
-    usernameElement.textContent = message.username;
+    usernameElement.className =
+        "message-user";
 
-    const textElement = document.createElement("span");
+    usernameElement.textContent =
+        message.username;
 
-    textElement.className = "message-text";
 
-    textElement.textContent = message.message;
+    const textElement =
+        document.createElement("span");
+
+    textElement.className =
+        "message-text";
+
+    textElement.textContent =
+        message.message;
+
 
     wrapper.appendChild(usernameElement);
     wrapper.appendChild(textElement);
 
-    if (message.created_at) {
-        const timeElement = document.createElement("small");
 
-        timeElement.className = "message-time";
+    if (message.created_at) {
+
+        const timeElement =
+            document.createElement("small");
+
+        timeElement.className =
+            "message-time";
 
         const date = new Date(
             message.created_at.replace(" ", "T") + "Z"
         );
 
         if (!Number.isNaN(date.getTime())) {
+
             timeElement.textContent =
                 date.toLocaleTimeString([], {
                     hour: "2-digit",
@@ -255,37 +283,40 @@ function addMessageToScreen(message) {
         wrapper.appendChild(timeElement);
     }
 
+
     messagesEl.appendChild(wrapper);
 }
 
 
-// ==========================================
+// ==========================
 // SEND MESSAGE
-// ==========================================
+// ==========================
 
-composer.addEventListener("submit", async (event) => {
-    event.preventDefault();
+if (composer) {
 
-    await sendMessage();
-});
+    composer.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        await sendMessage();
+
+    });
+
+}
 
 
 async function sendMessage() {
+
+    if (!inputEl) return;
+
     const message = inputEl.value.trim();
 
-    if (!message) {
-        return;
-    }
-
-    if (message.length > 2000) {
-        alert("Message is too long.");
-
-        return;
-    }
+    if (!message) return;
 
     inputEl.disabled = true;
 
     try {
+
         const response = await fetch(
             `${API}/api/messages`,
             {
@@ -302,24 +333,30 @@ async function sendMessage() {
             }
         );
 
+
         if (!response.ok) {
+
             throw new Error(
-                `Server returned HTTP ${response.status}`
+                `HTTP ${response.status}`
             );
+
         }
+
 
         const data = await response.json();
 
+
         if (data.error) {
+
             alert(data.error);
 
             return;
         }
 
-        // Add the newly created message immediately.
-        addMessageToScreen(data);
 
         messages.push(data);
+
+        addMessageToScreen(data);
 
         inputEl.value = "";
 
@@ -327,80 +364,140 @@ async function sendMessage() {
 
         setConnection("Connected", true);
 
+
     } catch (error) {
-        console.error("Send message error:", error);
+
+        console.error(
+            "Send message error:",
+            error
+        );
 
         setConnection("Offline", false);
 
-        alert("Could not connect to the Chatty server.");
+        alert(
+            "Could not connect to the Chatty server."
+        );
 
     } finally {
-        inputEl.disabled = false;
 
+        inputEl.disabled = false;
         inputEl.focus();
+
     }
 }
 
 
-// ==========================================
+// ==========================
 // ENTER TO SEND
-// SHIFT + ENTER = NEW LINE
-// ==========================================
+// ==========================
 
-inputEl.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
+if (inputEl) {
 
-        composer.requestSubmit();
-    }
-});
+    inputEl.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                if (composer) {
+                    composer.requestSubmit();
+                }
+            }
+
+        }
+    );
+
+}
 
 
-// ==========================================
+// ==========================
 // NICKNAME
-// ==========================================
+// ==========================
 
-changeNickButton.addEventListener("click", () => {
-    modalInput.value = username;
+if (changeNickButton) {
 
-    modal.classList.remove("hidden");
+    changeNickButton.addEventListener(
+        "click",
+        () => {
 
-    modalInput.focus();
+            if (!modal) return;
 
-    modalInput.select();
-});
+            modalInput.value = username;
+
+            modal.classList.remove("hidden");
+
+            modalInput.focus();
+            modalInput.select();
+
+        }
+    );
+
+}
 
 
-modalCancel.addEventListener("click", () => {
-    modal.classList.add("hidden");
-});
+if (modalCancel) {
+
+    modalCancel.addEventListener(
+        "click",
+        () => {
+
+            modal.classList.add("hidden");
+
+        }
+    );
+
+}
 
 
-modalOK.addEventListener("click", () => {
-    changeUsername();
-});
+if (modalOK) {
+
+    modalOK.addEventListener(
+        "click",
+        changeUsername
+    );
+
+}
 
 
-modalInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-        changeUsername();
-    }
+if (modalInput) {
 
-    if (event.key === "Escape") {
-        modal.classList.add("hidden");
-    }
-});
+    modalInput.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (event.key === "Enter") {
+                changeUsername();
+            }
+
+            if (event.key === "Escape") {
+                modal.classList.add("hidden");
+            }
+
+        }
+    );
+
+}
 
 
 function changeUsername() {
-    const newName = modalInput.value.trim();
 
-    if (!newName) {
-        return;
-    }
+    if (!modalInput) return;
+
+    const newName =
+        modalInput.value.trim();
+
+    if (!newName) return;
 
     if (newName.length > 24) {
-        alert("Nickname must be 24 characters or less.");
+
+        alert(
+            "Nickname must be 24 characters or less."
+        );
 
         return;
     }
@@ -412,46 +509,81 @@ function changeUsername() {
         username
     );
 
-    myNameEl.textContent = username;
+    if (myNameEl) {
+        myNameEl.textContent = username;
+    }
 
-    avatarEl.textContent =
-        username.charAt(0).toUpperCase();
+    if (avatarEl) {
+        avatarEl.textContent =
+            username.charAt(0).toUpperCase();
+    }
 
-    modal.classList.add("hidden");
+    if (modal) {
+        modal.classList.add("hidden");
+    }
 }
 
 
-// ==========================================
+// ==========================
 // USER PANEL
-// ==========================================
+// ==========================
 
-usersToggle.addEventListener("click", () => {
-    userPanel.classList.toggle("hidden");
-});
+if (usersToggle) {
+
+    usersToggle.addEventListener(
+        "click",
+        () => {
+
+            if (userPanel) {
+                userPanel.classList.toggle("hidden");
+            }
+
+        }
+    );
+
+}
 
 
-// ==========================================
-// TYPING UI
-// ==========================================
+// ==========================
+// TYPING
+// ==========================
 
 let typingTimeout;
 
-inputEl.addEventListener("input", () => {
-    typingEl.textContent = "";
+if (inputEl) {
 
-    clearTimeout(typingTimeout);
+    inputEl.addEventListener(
+        "input",
+        () => {
 
-    typingTimeout = setTimeout(() => {
-        typingEl.textContent = "";
-    }, 1000);
-});
+            if (typingEl) {
+                typingEl.textContent = "";
+            }
 
+            clearTimeout(typingTimeout);
 
-// ==========================================
-// SCROLL
-// ==========================================
+            typingTimeout = setTimeout(() => {
 
-function scrollToBottom() {
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+                if (typingEl) {
+                    typingEl.textContent = "";
+                }
+
+            }, 1000);
+
+        }
+    );
+
 }
 
+
+// ==========================
+// SCROLL
+// ==========================
+
+function scrollToBottom() {
+
+    if (!messagesEl) return;
+
+    messagesEl.scrollTop =
+        messagesEl.scrollHeight;
+}
